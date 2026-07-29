@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { UIMessage } from "@/types";
 import { TextMessage } from "./messages/TextMessage";
@@ -114,11 +114,16 @@ export function MessageList({
   // CSS (direct-child `data-print-role` selectors) works unchanged.
   if (printing) {
     return (
+      // Fragment (not a wrapping div) keeps each turn's `data-print-role`
+      // elements as *direct* children of #chat-messages, so the @media print
+      // rules `#chat-messages > [data-print-role]` still match. The container's
+      // own `space-y-3` supplies the inter-element gap, as in the pre-virtualized
+      // version.
       <div id="chat-messages" className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {groups.map((group) => (
-          <div key={group.key} className="space-y-3">
+          <Fragment key={group.key}>
             <TurnContent group={group} showReasoning={showReasoning} onChartError={onChartError} />
-          </div>
+          </Fragment>
         ))}
       </div>
     );
